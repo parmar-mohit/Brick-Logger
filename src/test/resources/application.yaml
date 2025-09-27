@@ -1,0 +1,20 @@
+logger:
+  clear: true
+  trace:
+    file: target/trace-logfile.log
+  debug:
+    file: target/debug-logfile.log
+  info:
+    file:
+      - target/info-logfile1.log
+      - target/info-logfile2.log
+  warn:
+    file: target/warn-logfile.log
+  error:
+    file: target/error-logfile.log
+  fatal:
+    file: target/fatal-logfile.log
+  all:
+    file:
+      - target/all-logfile1.log
+      - target/all-logfile2.log
