@@ -12,19 +12,11 @@ import java.time.LocalDateTime;
     and passes it to handler which then outputs it to various destinations
  */
 public class Logger {
-    private static Logger instance;
 
-    private static Logger getInstance(){
-        if( instance == null ){
-            synchronized (Logger.class){
-                if( instance == null ){
-                    instance = new Logger();
-                }
-            }
-        }
-
-        return instance;
+    static {
+        instance = new Logger();
     }
+    private static Logger instance;
 
     private final LogHandler handler;
     private Logger(){
@@ -41,7 +33,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void debug(String message){
@@ -50,7 +42,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void info(String message){
@@ -59,7 +51,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void warn(String message){
@@ -68,7 +60,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void error(String message){
@@ -77,7 +69,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void fatal(String message){
@@ -86,7 +78,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        getInstance().handler.writeLog(logMessage);
+        instance.handler.writeLog(logMessage);
     }
 
     public static void logException(Exception exception){
@@ -94,7 +86,7 @@ public class Logger {
         exceptionMessage.setLevel(LogLevel.ERROR);
         exceptionMessage.setTimestamp(LocalDateTime.now());
         exceptionMessage.setLogMessage(exception.getMessage());
-        getInstance().handler.writeLog(exceptionMessage);
+        instance.handler.writeLog(exceptionMessage);
 
         Message exceptionMessageStackTrace = new Message();
         exceptionMessageStackTrace.setLevel(LogLevel.ERROR);
@@ -102,9 +94,10 @@ public class Logger {
 
         StringBuilder exceptionTrace = new StringBuilder();
         for( StackTraceElement traceLine: exception.getStackTrace() ){
-            exceptionTrace.append(traceLine.toString()).append("\n");
+            exceptionTrace.append(traceLine.toString()).append("\n\t\t");
         }
-        exceptionMessageStackTrace.setLogMessage(exceptionTrace.toString());
-        getInstance().handler.writeLog(exceptionMessageStackTrace);
+        String stackTraceMessage = exceptionTrace.substring(0,exceptionTrace.length()-2);
+        exceptionMessageStackTrace.setLogMessage(stackTraceMessage);
+        instance.handler.writeLog(exceptionMessageStackTrace);
     }
 }

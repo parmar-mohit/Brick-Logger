@@ -46,12 +46,12 @@ public class LoggerTest {
 
 
         //Debug Test
-//        fileData = readFileAsString("target/debug-logfile.log");
-//        logData = fileData.split("\r")[0].split(" ");
-//        logDateTime = LocalDateTime.parse(logData[0]);
-//        assertTrue(isWithinFiveMinutes(logDateTime));
-//        assertEquals("DEBUG",logData[1]);
-//        assertEquals("log-message:DebugLoggerMessage",logData[2]);
+        fileData = readFileAsString("target/debug-logfile.log");
+        logData = fileData.split("\r")[0].split(" ");
+        logDateTime = LocalDateTime.parse(logData[0]);
+        assertTrue(isWithinFiveMinutes(logDateTime));
+        assertEquals("DEBUG",logData[1]);
+        assertEquals("log-message:DebugLoggerMessage",logData[2]);
 
         //Info Test
         fileData = readFileAsString("target/info-logfile1.log");

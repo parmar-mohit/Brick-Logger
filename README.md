@@ -86,8 +86,8 @@ Logger.debug("Debugging details here...");
 ```
 logger-framework/
 ├── src/
-│   ├── main/java/com/example/logger/   # Core logger implementation
-│   ├── test/java/com/example/logger/   # Unit tests                   # Example configuration
+│   ├── main/java/com/brick/logger/   # Core logger implementation
+│   ├── test/java/com/brick/logger/   # Unit tests                   # Example configuration
 ├── documentation/
 │   ├── config.md             # Full configuration documentation
 └── README.md                           # Project overview

@@ -96,12 +96,11 @@ public class FileAppender implements LogAppender, Closeable {
     private static void createFileIfNotExist(String filePath, boolean clearExistingLogs){
         Path path = Paths.get(filePath);
         try{
-            if( path.isAbsolute() ) {
-                Files.createDirectories(path.getParent());
-            }
+            Files.createDirectories(path.getParent());
+
             if (Files.exists(path) && clearExistingLogs) {
                 Files.newBufferedWriter(path, StandardOpenOption.TRUNCATE_EXISTING).close();
-            }else{
+            }else if( !Files.exists(path) ){
                 Files.createFile(path);
             }
 
