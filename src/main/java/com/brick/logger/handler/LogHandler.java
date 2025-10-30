@@ -14,16 +14,41 @@ public abstract class LogHandler {
     private static final String CONFIG_ROOT = "logger";
     private static final String CLEAR_FLAG = CONFIG_ROOT + Config.SEPERATOR + "clear";
 
+    // Common FileAppender for All Logs Files
+    private static final List<LogAppender> allLogAppender;
+    static{
+        boolean clearExistingLogs = false;
+        try{
+            clearExistingLogs  = Config.getConfigBoolean(CLEAR_FLAG);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        // All Config
+        allLogAppender = new ArrayList<>();
+        String configKey = CONFIG_ROOT + Config.SEPERATOR + LOG_LEVEL + Config.SEPERATOR + "file";
+        try {
+            Object fileAppenderData = Config.getConfigObject(configKey);
+            if( fileAppenderData instanceof String ){
+                allLogAppender.add(new FileAppender((String)fileAppenderData, clearExistingLogs));
+            }else if( fileAppenderData instanceof List ){
+                for( String filePath: (List<String>)fileAppenderData ){
+                   allLogAppender.add(new FileAppender(filePath, clearExistingLogs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected List<LogAppender> appenders;
     protected LogHandler nextHandler;
     public LogHandler() {
         this.appenders = new ArrayList<>();
-
-        initialiseFileAppenders(LOG_LEVEL);
+        this.appenders.addAll(allLogAppender);
     }
 
     protected void initialiseFileAppenders(String logLevel){
-
         boolean clearExistingLogs = false;
         try{
             clearExistingLogs  = Config.getConfigBoolean(CLEAR_FLAG);
