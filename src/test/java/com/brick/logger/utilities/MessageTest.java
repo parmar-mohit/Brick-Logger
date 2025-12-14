@@ -20,7 +20,7 @@ public class MessageTest {
         assertEquals(currentDateTime,message.getTimestamp());
         assertEquals(LogLevel.INFO,message.getLevel());
         assertEquals("Hello World",message.getLogMessage());
-        String logOutput = currentDateTime+" "+LogLevel.INFO+" log-message:Hello World";
+        String logOutput = currentDateTime+" "+LogLevel.INFO+" thread-name:" + Thread.currentThread().getName() +" log-message:Hello World";
         assertEquals(logOutput,message.toString());
     }
 }
