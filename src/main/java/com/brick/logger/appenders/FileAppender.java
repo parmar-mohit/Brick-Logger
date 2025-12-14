@@ -61,6 +61,7 @@ public class FileAppender implements LogAppender, Closeable {
                e.printStackTrace();
            }
         });
+        this.worker.setName("appender-"+filePath+"-thread");
 
         worker.start();
     }

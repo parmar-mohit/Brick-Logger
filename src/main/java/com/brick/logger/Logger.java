@@ -12,15 +12,23 @@ import java.time.LocalDateTime;
     and passes it to handler which then outputs it to various destinations
  */
 public class Logger {
-
-    static {
-        instance = new Logger();
-    }
+    
     private static Logger instance;
 
     private final LogHandler handler;
     private Logger(){
         handler = LogHandler.getLogHandlerChain();
+    }
+    
+    public static Logger getInstance() {
+        if (instance == null) {
+            synchronized (Logger.class) {
+                if (instance == null) {
+                    instance = new Logger();
+                }
+            }
+        }
+        return instance;
     }
 
     public LogHandler getHandler() {
@@ -33,7 +41,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void debug(String message){
@@ -42,7 +50,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void info(String message){
@@ -51,7 +59,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void warn(String message){
@@ -60,7 +68,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void error(String message){
@@ -69,7 +77,7 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void fatal(String message){
@@ -78,26 +86,46 @@ public class Logger {
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLogMessage(message);
 
-        instance.handler.writeLog(logMessage);
+        getInstance().handler.writeLog(logMessage);
     }
 
     public static void logException(Exception exception){
         Message exceptionMessage = new Message();
-        exceptionMessage.setLevel(LogLevel.ERROR);
+        exceptionMessage.setLevel(LogLevel.WARN);
         exceptionMessage.setTimestamp(LocalDateTime.now());
-        exceptionMessage.setLogMessage(exception.getMessage());
-        instance.handler.writeLog(exceptionMessage);
+        exceptionMessage.setLogMessage(exception.getClass().getName() + " : " + exception.getMessage());
+        getInstance().handler.writeLog(exceptionMessage);
 
         Message exceptionMessageStackTrace = new Message();
-        exceptionMessageStackTrace.setLevel(LogLevel.ERROR);
+        exceptionMessageStackTrace.setLevel(LogLevel.WARN);
         exceptionMessageStackTrace.setTimestamp(LocalDateTime.now());
 
-        StringBuilder exceptionTrace = new StringBuilder();
+        StringBuilder exceptionTrace = new StringBuilder(exception.getClass().getName() + "\n\t\t");
         for( StackTraceElement traceLine: exception.getStackTrace() ){
             exceptionTrace.append(traceLine.toString()).append("\n\t\t");
         }
         String stackTraceMessage = exceptionTrace.substring(0,exceptionTrace.length()-2);
         exceptionMessageStackTrace.setLogMessage(stackTraceMessage);
-        instance.handler.writeLog(exceptionMessageStackTrace);
+        getInstance().handler.writeLog(exceptionMessageStackTrace);
+    }
+    
+    public static void logError(Error error){
+        Message exceptionMessage = new Message();
+        exceptionMessage.setLevel(LogLevel.ERROR);
+        exceptionMessage.setTimestamp(LocalDateTime.now());
+        exceptionMessage.setLogMessage(error.getClass().getName() + " : " + error.getMessage());
+        getInstance().handler.writeLog(exceptionMessage);
+
+        Message exceptionMessageStackTrace = new Message();
+        exceptionMessageStackTrace.setLevel(LogLevel.ERROR);
+        exceptionMessageStackTrace.setTimestamp(LocalDateTime.now());
+
+        StringBuilder exceptionTrace = new StringBuilder(error.getClass().getName() + "\n\t\t " );
+        for( StackTraceElement traceLine: error.getStackTrace() ){
+            exceptionTrace.append(traceLine.toString()).append("\n\t\t");
+        }
+        String stackTraceMessage = exceptionTrace.substring(0,exceptionTrace.length()-2);
+        exceptionMessageStackTrace.setLogMessage(stackTraceMessage);
+        getInstance().handler.writeLog(exceptionMessageStackTrace);
     }
 }

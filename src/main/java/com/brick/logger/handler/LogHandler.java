@@ -1,10 +1,12 @@
 package com.brick.logger.handler;
 
+import com.brick.logger.Logger;
 import com.brick.logger.appenders.FileAppender;
 import com.brick.logger.appenders.LogAppender;
 import com.brick.logger.utility.LogLevel;
 import com.brick.logger.utility.Message;
 import com.brick.utilities.Config;
+import com.brick.utilities.exception.ConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public abstract class LogHandler {
         boolean clearExistingLogs = false;
         try{
             clearExistingLogs  = Config.getConfigBoolean(CLEAR_FLAG);
-        }catch (Exception e){
+        }catch (ConfigException e){
             e.printStackTrace();
         }
 
@@ -68,7 +70,9 @@ public abstract class LogHandler {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+        	if(! ( e instanceof ConfigException)  ) {
+        		throw new RuntimeException(e);
+        	}
         }
     }
 

@@ -9,6 +9,7 @@ public class Message {
     private LocalDateTime timestamp;
     private LogLevel level;
     private String logMessage;
+    private String logThread;
 
     private static final String SEPERATOR = " ";
 
@@ -18,6 +19,7 @@ public class Message {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+        this.logThread = Thread.currentThread().getName();
     }
 
     public LogLevel getLevel() {
@@ -38,6 +40,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return timestamp + SEPERATOR + level + SEPERATOR + "log-message:"+logMessage;
+        return timestamp + SEPERATOR + level + SEPERATOR + "thread-name:" + logThread + SEPERATOR + "log-message:"+logMessage;
     }
 }
