@@ -101,5 +101,14 @@ public class LoggerTest {
         logDateTime = LocalDateTime.parse(logData[0]);
         assertTrue(isWithinFiveMinutes(logDateTime));
         assertEquals("WARN",logData[1]);
+        
+        //Error Test
+        Error error = new Error("ErrorMessage");
+        Logger.logError(error);
+        fileData = readFileAsString("target/error-logfile.log");
+        logData = fileData.split("\r\n")[2].split(" ");
+        logDateTime = LocalDateTime.parse(logData[0]);
+        assertTrue(isWithinFiveMinutes(logDateTime));
+        assertEquals("ERROR",logData[1]);
     }
 }

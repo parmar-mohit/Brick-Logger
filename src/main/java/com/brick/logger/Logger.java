@@ -31,10 +31,6 @@ public class Logger {
         return instance;
     }
 
-    public LogHandler getHandler() {
-        return handler;
-    }
-
     public static void trace(String message){
         Message logMessage = new Message();
         logMessage.setLevel(LogLevel.TRACE);

@@ -4,13 +4,18 @@ import com.brick.logger.utility.LogLevel;
 import com.brick.logger.utility.Message;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileAppenderTest {
 
@@ -22,16 +27,71 @@ public class FileAppenderTest {
     @Test
     public void test_fileOutput() throws IOException, InterruptedException {
         String filePath = "target/file-appender.log";
-        LogAppender logAppender = new FileAppender(filePath,true);
+        FileAppender fileAppender = new FileAppender(filePath,true);
 
         Message logMessage = new Message();
         logMessage.setTimestamp(LocalDateTime.now());
         logMessage.setLevel(LogLevel.INFO);
         logMessage.setLogMessage("Hello World");
 
-        logAppender.appendLog(logMessage);
+        fileAppender.appendLog(logMessage);
 
         Thread.sleep(100);
         assertEquals(logMessage.toString(), readFileAsString(filePath).split("\r")[0]);
+        fileAppender.close();
+    }
+    
+    @Test
+    public void threadInterruptException() throws IOException, InterruptedException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    	String filePath = "target/file-appender.log";
+        FileAppender fileAppender = new FileAppender(filePath,true);
+
+        Message logMessage = new Message();
+        logMessage.setTimestamp(LocalDateTime.now());
+        logMessage.setLevel(LogLevel.INFO);
+        logMessage.setLogMessage("Hello World");
+
+        fileAppender.appendLog(logMessage);
+
+        // Example of accessing a private field named 'workerThread'
+        Field field = FileAppender.class.getDeclaredField("worker");
+        field.setAccessible(true);
+        Thread thread = (Thread) field.get(fileAppender);
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.err; // Save the original System.out
+
+        System.setErr(new PrintStream(outputStream)); // Redirect System.out
+
+        // Now you can interrupt it
+        thread.interrupt();
+        
+        thread.join(1000);
+        
+        // Assert
+        String output = outputStream.toString().split("\r")[0].trim();
+        assertEquals(InterruptedException.class.getName(), output);
+        
+        // Restore System.out
+        System.setErr(originalOut);
+    }
+    
+    @Test
+    public void createFileIfNotExist_test() throws IOException {
+    	String path1String = "target/test-file1.log";
+    	String path2String = "target/test-file2.log";
+    	
+    	Path path1 = Paths.get(path1String);
+    	Path path2 = Paths.get(path2String);
+    	
+    	Files.deleteIfExists(path1);
+    	Files.deleteIfExists(path2);
+    	
+    	FileAppender fileAppender1 = new FileAppender(path1String,false);
+    	FileAppender fileAppender2 = new FileAppender(path1String,true);
+    	FileAppender fileAppender3 = new FileAppender(path2String,false);
+    	
+    	assertTrue(Files.exists(path1));
+    	assertTrue(Files.exists(path2));
     }
 }
